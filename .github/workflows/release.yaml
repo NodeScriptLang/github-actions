@@ -39,5 +39,5 @@ jobs:
           context: .
           push: true
           file: ./invoke/Dockerfile
-          tags: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:latest
+          tags: ${{ steps.meta.outputs.tags }}
           tag_with_sha: true
