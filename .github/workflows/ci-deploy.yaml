@@ -4,7 +4,7 @@ on:
       workflow_id:
         required: false
         type: string
-        default: cd_deploy
+        default: cd-deploy
       gh_user:
         required: true
         type: string
