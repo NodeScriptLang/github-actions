@@ -18,7 +18,7 @@ on:
 
 jobs:
   build_image:
-    name: Image
+    name: Build
     runs-on: ubuntu-latest
     steps:
       - name: Extract TAG env

@@ -36,6 +36,10 @@ jobs:
     name: Deploy
     runs-on: ubuntu-latest
     steps:
+      - name: Extract TAG env
+        run: |
+          ref="${{ github.ref }}"
+          echo "TAG=${ref/refs\/tags\//}" >> $GITHUB_ENV
       - name: Dispatch repo event
         run: |-
           curl -L -X POST \
@@ -46,9 +50,9 @@ jobs:
             "client_payload": {
               "ref": "${{ github.ref }}",
               "sha": "${{ github.sha }}",
-              "tag": "${{ env.RELEASE_VERSION }}",
+              "tag": "${{ env.TAG }}",
               "image_name": "${{ inputs.image_name }}",
-              "image_tag": "${{ env.RELEASE_VERSION }}",
+              "image_tag": "${{ env.TAG }}",
               "env_name": "${{ inputs.env_name }}",
               "app_path": "${{ inputs.app_path }}",
               "auto_merge": ${{ inputs.auto_merge }},
