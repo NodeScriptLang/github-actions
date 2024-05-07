@@ -27,9 +27,8 @@ jobs:
           echo "TAG=${ref/refs\/tags\//}" >> $GITHUB_ENV
       - name: Extract IMAGE_REGISTRY env
         run: |
-          IMAGE="${{ inputs.image }}"
-          IMAGE_REGISTRY=$("echo $IMAGE | sed -e 's/\/.*$//'")
-          echo "IMAGE_REGISTRY=$IMAGE_REGISTRY" >> $GITHUB_ENV
+          image="${{ inputs.image }}"
+          echo "IMAGE_REGISTRY=${IMAGE/\/*/}" >> $GITHUB_ENV
       - name: Login to the Registry
         uses: docker/login-action@v1
         with:
