@@ -1,0 +1,49 @@
+on:
+  workflow_call:
+    inputs:
+      image:
+        required: true
+        type: string
+      file:
+        required: false
+        type: string
+        default: "Dockerfile"
+      platforms:
+        required: false
+        type: string
+        default: "linux/x86_64"
+    secrets:
+      REGISTRY_SECRET:
+        required: true
+
+jobs:
+  build_image:
+    name: Image
+    runs-on: ubuntu-latest
+    steps:
+      - name: Extract TAG env
+        run: |
+          ref="${{ github.ref }}"
+          echo "TAG=${ref/refs\/tags\//}" >> $GITHUB_ENV
+      - name: Extract IMAGE_REGISTRY env
+        run: |
+          IMAGE="${{ inputs.image }}"
+          IMAGE_REGISTRY=$("echo $IMAGE | sed -e 's/\/.*$//'")
+          echo "IMAGE_REGISTRY=$IMAGE_REGISTRY" >> $GITHUB_ENV
+      - name: Login to the Registry
+        uses: docker/login-action@v1
+        with:
+          registry: ${{ env.IMAGE_REGISTRY }}
+          username: _json_key
+          password: ${{ secrets.REGISTRY_SECRET }}
+      - name: Build and Push image
+        uses: docker/build-push-action@v2
+        with:
+          tags: ${{ inputs.image }}:${{ env.TAG }},${{ inputs.image }}:latest
+          file: ${{ inputs.file }}
+          platforms: ${{ inputs.platforms }}
+          push: true
+          build-args: |
+            VERSION=${{ env.TAG }}
+          labels: |
+            source-url=https://github.com/${{ github.repository }}
