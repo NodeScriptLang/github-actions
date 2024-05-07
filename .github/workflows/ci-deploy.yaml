@@ -41,18 +41,18 @@ jobs:
           curl -L -X POST \
           -H "Accept: application/vnd.github+json" \
           -H "Authorization: Bearer ${{ secrets.ACCESS_TOKEN }}" \
-          -d '{\
-            "event_type": "${{ inputs.event_type }}", \
-            "client_payload": { \
-              "ref": "${{ github.ref }}",\
-              "sha": "${{ github.sha }}",\
-              "tag": "${{ env.RELEASE_VERSION }}",\
-              "image_name": "${{ inputs.image_name }}",\
-              "image_tag": "${{ env.RELEASE_VERSION }}",\
-              "env_name": "${{ inputs.env_name }}",\
-              "app_path": "${{ inputs.app_path }}",\
-              "auto_merge": ${{ inputs.auto_merge }},\
-              "pr_assignees": "${{ inputs.pr_assignees }}"\
-            } \
+          -d '{
+            "event_type": "${{ inputs.event_type }}",
+            "client_payload": {
+              "ref": "${{ github.ref }}",
+              "sha": "${{ github.sha }}",
+              "tag": "${{ env.RELEASE_VERSION }}",
+              "image_name": "${{ inputs.image_name }}",
+              "image_tag": "${{ env.RELEASE_VERSION }}",
+              "env_name": "${{ inputs.env_name }}",
+              "app_path": "${{ inputs.app_path }}",
+              "auto_merge": ${{ inputs.auto_merge }},
+              "pr_assignees": "${{ inputs.pr_assignees }}"
+            }
           }' \
           https://api.github.com/repos/${{ inputs.gh_user }}/${{ inputs.gh_repo }}/dispatches
