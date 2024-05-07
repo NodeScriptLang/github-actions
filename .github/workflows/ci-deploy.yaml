@@ -1,7 +1,7 @@
 on:
   workflow_call:
     inputs:
-      workflow_id:
+      event_type:
         required: false
         type: string
         default: cd-deploy
@@ -36,20 +36,23 @@ jobs:
     name: Deploy
     runs-on: ubuntu-latest
     steps:
-      - name: Notify repo
+      - name: Dispatch repo event
         run: |-
           curl -L -X POST \
           -H "Accept: application/vnd.github+json" \
           -H "Authorization: Bearer ${{ secrets.ACCESS_TOKEN }}" \
           -d '{\
-            "ref": "${{ github.ref }}",\
-            "sha": "${{ github.sha }}",\
-            "tag": "${{ env.RELEASE_VERSION }}",\
-            "image_name": "${{ inputs.image_name }}",\
-            "image_tag": "${{ env.RELEASE_VERSION }}",\
-            "env_name": "${{ inputs.env_name }}",\
-            "app_path": "${{ inputs.app_path }}",\
-            "auto_merge": ${{ inputs.auto_merge }},\
-            "pr_assignees": "${{ inputs.pr_assignees }}"\
+            "event_type": "${{ inputs.event_type }}", \
+            "client_payload": { \
+              "ref": "${{ github.ref }}",\
+              "sha": "${{ github.sha }}",\
+              "tag": "${{ env.RELEASE_VERSION }}",\
+              "image_name": "${{ inputs.image_name }}",\
+              "image_tag": "${{ env.RELEASE_VERSION }}",\
+              "env_name": "${{ inputs.env_name }}",\
+              "app_path": "${{ inputs.app_path }}",\
+              "auto_merge": ${{ inputs.auto_merge }},\
+              "pr_assignees": "${{ inputs.pr_assignees }}"\
+            } \
           }' \
-          https://api.github.com/repos/${{ inputs.gh_user }}/${{ inputs.gh_repo }}/actions/workflows/${{ inputs.workflow_id }}/dispatches
+          https://api.github.com/repos/${{ inputs.gh_user }}/${{ inputs.gh_repo }}/dispatches
