@@ -1,0 +1,57 @@
+on:
+  workflow_call:
+    inputs:
+      workflow_id:
+        required: false
+        type: string
+        default: cd_deploy
+      gh_user:
+        required: true
+        type: string
+      gh_repo:
+        required: true
+        type: string
+      image_name:
+        required: true
+        type: string
+      env_name:
+        required: true
+        type: string
+      app_path:
+        required: true
+        type: string
+      auto_merge:
+        required: true
+        type: boolean
+      pr_assignees:
+        type: string
+        required: false
+        default: ""
+    secrets:
+      ACCESS_TOKEN:
+        required: true
+
+jobs:
+  deploy:
+    name: Deploy
+    runs-on: ubuntu-latest
+    steps:
+      - name: Notify repo
+        run: |-
+          export PAYLOAD='{
+            "ref": "${{ github.ref }}",
+            "sha": "${{ github.sha }}",
+            "tag": "${{ env.RELEASE_VERSION }}",
+            "image_name": "${{ inputs.image_name }}",
+            "image_tag": "${{ env.RELEASE_VERSION }}",
+            "env_name": "${{ inputs.env_name }}",
+            "app_path": "${{ inputs.app_path }}",
+            "auto_merge": ${{ inputs.auto_merge }},
+            "pr_assignees": "${{ inputs.pr_assignees }}"
+          }'
+
+          curl -L -X POST \
+          -H "Accept: application/vnd.github+json" \
+          -H "Authorization: Bearer ${{ secrets.ACCESS_TOKEN }}" \
+          https://api.github.com/repos/${{ inputs.gh_user }}/${{ inputs.gh_repo }}/actions/workflows/${{ inputs.workflow_id }}/dispatches \
+          -d ${PAYLOAD}
